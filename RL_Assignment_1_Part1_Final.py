@@ -8,6 +8,8 @@ import random
 
 class environment:
     def __init__(self,type_of_env:str,epsilon:float):
+
+        # No of number of states = 25 - Requirement 1
         self.environment = np.zeros((5,5))
         
         self.max_timesteps = 10
@@ -17,22 +19,27 @@ class environment:
         self.agent_current_pos = [0,0]
 
         self.environment[tuple(self.agent_current_pos)] = 1
-        self.environment[tuple(self.goal_pos)] = 10
+        self.environment[tuple(self.goal_pos)] = 0.5
 
+        # Collection of Rewards (the keys) and associated values (the states). -> Total No of Rewards = 4 -> Requirement 3
         self.reward_states = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]}]
         
+        # Setting the colors for the reward states in the environment.
         for reward_state in self.reward_states:
             for reward, position in reward_state.items():
                 self.environment[tuple(position)] = reward
 
+        # Either Deterministic or Stocastic.
         self.environment_type = type_of_env
 
+        # This determines the exploitation vs exploration phase.
         self.epsilon = epsilon
 
-
+        # This tracks the reward for the agent.
         self.cumulative_reward = 0
 
     def reset(self):
+        # Here we are essentially resetting all the values.
         self.current_time_steps = 0
         self.cumulative_reward = 0
 
@@ -48,13 +55,18 @@ class environment:
                 self.environment[tuple(position)] = reward
 
         self.environment[self.agent_current_pos] = 1
-        self.environment[self.goal_pos] = 10
+        self.environment[self.goal_pos] = 0.5
     
     def step(self, action):
+
+        # We are checking wether the environment is deterministic or stocastic
         if self.environment_type == 'deterministic':
+            # In Deterministic environments, there is no use for epsilon as all the actions are deterministic / greedy / pre-determined.
+
             self.epsilon = 0
             self.current_time_steps +=1
 
+            # The agent can take a maximum of 4 actions i.e Up, Down, Left or Right. -> Requirement 2
             if action == 0:
                 print('Up')
                 self.agent_current_pos[0] -=1
@@ -74,25 +86,35 @@ class environment:
             else:
                 print('Action was undefined')
 
+            # Here we are clipping the agents position to be in the environment (i.e if the agent goes out of env, we shall clip him to be inside the environment).
             self.agent_current_pos = list(np.clip(self.agent_current_pos, 0, 4))
 
-            for reward_state in reward_states:
-                for reward, state in reward_state.items():
+            # Here we are calculating the reward (i.e. the cumulative reward) and deleting that reward state from the collection of the reward states.
+            breaker = False
+            for reward_state_counter in range(len(self.reward_states)):
+                for reward, state in self.reward_states[reward_state_counter].items():
+                    # if the reward state matches the agents, sum the cum reward and delete that particular reward state space.
+
                     if state == self.agent_current_pos:
                         self.cumulative_reward += reward
+                        del self.reward_states[reward_state_counter]
+                        breaker = True
+                        break
+
+                if breaker:
+                    break
             
-            self.reward_states = self.get_new_reward_states(self.reward_states)
+            # We are now re-visualizing the environment
             self.environment = np.zeros((5,5)) 
 
             for reward_state_counter in range(len(self.reward_states)):
-                print(self.reward_states[reward_state_counter])
                 for reward, position in self.reward_states[reward_state_counter].items():
                     self.environment[tuple(position)] = reward
-                    del self.reward_states[reward_state_counter]
                 
             self.environment[tuple(self.goal_pos)] = 0.5
             self.environment[tuple(self.agent_current_pos)] = 1
             
+            # if the agent has reached the final state then delete the 
             if (self.agent_current_pos == self.goal_pos) or (self.current_time_steps == self.max_timesteps):
                 done_or_not = True
             
@@ -138,10 +160,8 @@ class environment:
                 if breaker:
                     break
             
-            self.reward_states = self.get_new_reward_states(self.reward_states)
-
+            # We are now re-visualizing the environment
             self.environment = np.zeros((5,5)) 
-            
             
             for reward_state_counter in range(len(self.reward_states)):
                 for reward, position in self.reward_states[reward_state_counter].items():
@@ -197,16 +217,6 @@ class environment:
 
         elif shift == [0,1]:
             print('The Agent Ended Up Going Left')
-
-    def get_new_reward_states(self, reward_states):
-        reward_states_revised = []
-
-        for counter in range(len(reward_states)):
-            for reward, position in reward_states[counter].items():
-                if position != self.agent_current_pos: 
-                    reward_states_revised.append(reward_states[counter])
-
-        return reward_states_revised
 
     def render(self):
         plt.imshow(self.environment)
