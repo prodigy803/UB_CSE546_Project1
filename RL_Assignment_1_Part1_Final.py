@@ -256,7 +256,7 @@ class environment:
 
 
 # The following lines of code are for demonstrating the environment under predefined inputs.
-sto = environment(type_of_env='deterministic',epsilon=0.3)
+sto = environment(type_of_env='stochastic',epsilon=0.3)
 print('Start State')
 sto.render()
 for action in [3,3,3,1,1,2,1,3,3,1]:
