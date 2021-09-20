@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
-%matplotlib inline
+import matplotlib.pyplot as plt
 
 import random
 
@@ -179,6 +178,18 @@ class environment:
             return self.environment.flatten, self.cumulative_reward, done_or_not, self.current_time_steps
 
     def get_final_action(self, action1, action2, action3):
+
+        """
+        This function gets the final action for the "stocastic" modeled environment.
+        
+        For example take Epsilon as 0.7
+        
+        Then when we generate the random no, and if it is in the range of 0 - 0.7 (or 0.69999), then we take random exploratory actions.
+        When we generate the random no, and if its is in the range of 0.7 - 1, then we take the greedy (or pre-determined) step in our case.
+        Please note that at the moment the steps are chosen arbritrarily and not based the next states (like if there is a reward waiting in the 
+        next state, then in the current version of the environment, we are not bothering about that, we are still going ahead with predetermined states
+        with a chance of taking a random action).
+        """
     
         random_n_number = random.uniform(0, 1)
         print('randn is', random_n_number)
@@ -205,6 +216,8 @@ class environment:
 
 
     def get_action_comparison(self,old_pos, new_pos):
+        # This function tells us whether the final step the agent took after completing stocastic decision.
+        
         shift = [old_pos[i]-new_pos[i] for i in range(len(new_pos))]
 
         if shift == [-1,0]: 
