@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
-
 import matplotlib.pyplot as plt
+
+%matplotlib inline
 
 import random
 
@@ -11,7 +12,7 @@ class environment:
         # No of number of states = 25 - Requirement 1
         self.environment = np.zeros((5,5))
         
-        self.max_timesteps = 10
+        self.max_timesteps = 50
         self.current_time_steps = 0
         
         self.goal_pos = [4,4]
@@ -217,7 +218,7 @@ class environment:
 
     def get_action_comparison(self,old_pos, new_pos):
         # This function tells us whether the final step the agent took after completing stocastic decision.
-        
+
         shift = [old_pos[i]-new_pos[i] for i in range(len(new_pos))]
 
         if shift == [-1,0]: 
@@ -235,12 +236,30 @@ class environment:
         plt.imshow(self.environment)
         plt.show()
 
+# The following lines of code are for demonstrating the environment under random inputs.
+# sto = environment(type_of_env='deterministic',epsilon=0.3)
+# print('Start State')
+# sto.render()
+# for i in range(10):
+    
+#     action = random.randrange(0,4)
+#     observation, reward, done, _ = sto.step(action)
+#     if done:
+#         sto.render()
+#         break
+#     else:
+#         sto.render()
+    
+#     print('----------------')
+# sto.reset()
+# print("The Final Reward is",reward)
+
+
+# The following lines of code are for demonstrating the environment under predefined inputs.
 sto = environment(type_of_env='deterministic',epsilon=0.3)
 print('Start State')
 sto.render()
-for i in range(10):
-    
-    action = random.randrange(0,4)
+for action in [3,3,3,1,1,2,1,3,3,1]:
     observation, reward, done, _ = sto.step(action)
     if done:
         sto.render()
