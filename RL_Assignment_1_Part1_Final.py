@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 %matplotlib inline
 
 import random
@@ -223,8 +223,10 @@ class environment:
         plt.show()
 
 sto = environment(type_of_env='stochastic',epsilon=0.3)
+
 print('Start State')
 sto.render()
+
 for i in range(10):
     
     action = random.randrange(0,4)
@@ -237,4 +239,5 @@ for i in range(10):
     
     print('----------------')
 sto.reset()
+
 print("The Final Reward is",reward)
