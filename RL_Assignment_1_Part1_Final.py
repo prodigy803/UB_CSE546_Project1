@@ -29,7 +29,7 @@ class environment:
             for reward, position in reward_state.items():
                 self.environment[tuple(position)] = reward
 
-        # Either Deterministic or Stocastic.
+        # Either Deterministic or stochastic.
         self.environment_type = type_of_env
 
         # This determines the exploitation vs exploration phase.
@@ -59,7 +59,7 @@ class environment:
     
     def step(self, action):
 
-        # We are checking wether the environment is deterministic or stocastic
+        # We are checking wether the environment is deterministic or stochastic
         if self.environment_type == 'deterministic':
             # In Deterministic environments, there is no use for epsilon as all the actions are deterministic / greedy / pre-determined.
 
@@ -181,7 +181,7 @@ class environment:
     def get_final_action(self, action1, action2, action3):
 
         """
-        This function gets the final action for the "stocastic" modeled environment.
+        This function gets the final action for the "stochastic" modeled environment.
         
         For example take Epsilon as 0.7
         
@@ -217,7 +217,7 @@ class environment:
 
 
     def get_action_comparison(self,old_pos, new_pos):
-        # This function tells us whether the final step the agent took after completing stocastic decision.
+        # This function tells us whether the final step the agent took after completing stochastic decision.
 
         shift = [old_pos[i]-new_pos[i] for i in range(len(new_pos))]
 
