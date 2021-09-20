@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-%matplotlib inline
+# %matplotlib inline
 
 import random
 
@@ -114,7 +114,7 @@ class environment:
             self.environment[tuple(self.goal_pos)] = 0.5
             self.environment[tuple(self.agent_current_pos)] = 1
             
-            # if the agent has reached the final state then delete the 
+            # if the agent has reached the final state then done
             if (self.agent_current_pos == self.goal_pos) or (self.current_time_steps == self.max_timesteps):
                 done_or_not = True
             
@@ -148,9 +148,13 @@ class environment:
 
             print('Final Agent POS', str(self.agent_current_pos))
             
+            # Here we are calculating the reward (i.e. the cumulative reward) and deleting that reward state from the collection of the reward states.
+
             breaker = False
             for reward_state_counter in range(len(self.reward_states)):
                 for reward, state in self.reward_states[reward_state_counter].items():
+                    # if the reward state matches the agents, sum the cum reward and delete that particular reward state space.
+
                     if state == self.agent_current_pos:
                         self.cumulative_reward += reward
                         del self.reward_states[reward_state_counter]
@@ -170,6 +174,7 @@ class environment:
             self.environment[tuple(self.goal_pos)] = 0.5
             self.environment[tuple(self.agent_current_pos)] = 1
             
+            # if the agent has reached the final state then done
             if (self.agent_current_pos == self.goal_pos) or (self.current_time_steps == self.max_timesteps):
                 done_or_not = True
             
@@ -211,6 +216,8 @@ class environment:
             raise ValueError('A Very Bad Probability thing happened.')
 
         self.get_action_comparison(old_pos,self.agent_current_pos)
+            
+        # Here we are clipping the agents position to be in the environment (i.e if the agent goes out of env, we shall clip him to be inside the environment).
 
         self.agent_current_pos = list(np.clip(self.agent_current_pos, 0, 4))
         return self.agent_current_pos
