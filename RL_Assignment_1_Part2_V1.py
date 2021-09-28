@@ -122,7 +122,7 @@ class environment_q_learning:
                 
                 
                 if q_value > self.qvalue_table[tuple([state_result[0],state_result[1]])][action]:
-                    print("q_value is getting updated ",q_value, "for ", self.qvalue_table[tuple(state_result[0],state_result[1])], 'for action, ', action)
+                    print("q_value is getting updated ",q_value, "for ", self.qvalue_table[tuple([state_result[0],state_result[1]])], 'for action, ', action)
                     self.qvalue_table[tuple([state_result[0],state_result[1]])][action] = q_value
 
                 if current_max < q_value:
