@@ -66,7 +66,7 @@ class environment_dq_learning:
         self.environment[tuple(self.goal_pos)] = 0.5
 
         # Collection of Rewards (the keys) and associated values (the states). -> Total No of Rewards = 4 -> Requirement 3
-        self.rewards = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]},{5:[4,4]}]
+        self.rewards = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]},{15:[4,4]}]
         self.reward_states = [(0,3),(3,0),(2,3),(3,2),(4,4)]
         # Setting the colors for the reward states in the environment.
         for reward_state in self.rewards:
@@ -93,7 +93,7 @@ class environment_dq_learning:
         
         self.environment = np.zeros((5,5))
         
-        self.rewards = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]},{5:[4,4]}]
+        self.rewards = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]},{15:[4,4]}]
         self.reward_states = [(0,3),(3,0),(2,3),(3,2),[4,4]]
         
         for reward in self.rewards:
@@ -218,8 +218,12 @@ class environment_dq_learning:
                 if random.uniform(0, 1) > 0.5:
                     old_q_value = self.qvalue_table_a[tuple(self.agent_current_pos)][selected_action]
                     
+                    # This returns the index of action which has got max qvalue in table a
                     max_temp = self.qvalue_table_a[tuple(selected_state)].max()
                     index = self.qvalue_table_a[tuple(selected_state)].tolist().index(max_temp)
+                    
+                    # Here we are updating the q-value of table_a for current agent position for the previously selected action(as per the epsilon greedy approach)
+                    # self.qvalue_table_b[tuple(selected_state)][index] - Qvalue in table_b for action which has got max qvalue in table a
                     
                     self.qvalue_table_a[tuple(self.agent_current_pos)][selected_action] = old_q_value + self.learning_rate * (selected_reward + self.gamma * self.qvalue_table_b[tuple(selected_state)][index] - old_q_value)
                 else:
@@ -227,6 +231,9 @@ class environment_dq_learning:
                     
                     max_temp = self.qvalue_table_b[tuple(selected_state)].max()
                     index = self.qvalue_table_b[tuple(selected_state)].tolist().index(max_temp)
+
+                    # Here we are updating the q-value of table_a for current agent position for the previously selected action(as per the epsilon greedy approach)
+                    # self.qvalue_table_b[tuple(selected_state)][index] - Qvalue in table_b for action which has got max qvalue in table a
 
                     self.qvalue_table_b[tuple(self.agent_current_pos)][selected_action] = old_q_value + self.learning_rate * (selected_reward + self.gamma * self.qvalue_table_a[tuple(selected_state)][index] - old_q_value)
                
@@ -242,6 +249,9 @@ class environment_dq_learning:
         states_the_actions_lead_to = self.get_states_for_actions(all_possible_actions,self.agent_current_pos)
 
         selected_action, selected_state = self.return_state_action_pair_greedy(all_possible_actions,states_the_actions_lead_to)
+        
+        if self.environment_type == 'stochastic':
+            selected_action, selected_state = self.return_final_stochastic(selected_action, selected_state,all_possible_actions,states_the_actions_lead_to)
 #         print("Agent was at {}, he evaluated {} via actions {} and chose state {} via action {}".format(self.agent_current_pos,all_possible_actions,all_possible_actions,selected_state, selected_action))
         breaker = False
         for reward_state_counter in range(len(self.rewards)):
@@ -300,7 +310,7 @@ class environment_dq_learning:
         return chosen_action, chosen_state
 
     def return_state_action_pair_greedy(self,all_possible_actions,states_the_actions_lead_to):
-        action_to_be_returned, state_to_be_returned, _, _ = self.get_best_state_on_q_value(self.agent_current_pos,all_possible_actions,states_the_actions_lead_to)
+        action_to_be_returned, state_to_be_returned, _ = self.get_best_state_on_q_value(self.agent_current_pos,all_possible_actions,states_the_actions_lead_to)
         return action_to_be_returned, state_to_be_returned,
         
     def return_state_action_pair(self,all_possible_actions,states_the_actions_lead_to):
@@ -338,7 +348,7 @@ class environment_dq_learning:
 
                 state_to_be_returned = state
                 action_to_be_returned = action
-                
+            
 
             elif current_max != None:
                 max1 = (self.qvalue_table_a[tuple(current_state)][action] + self.qvalue_table_b[tuple(current_state)][action])/2
@@ -488,8 +498,8 @@ class environment_dq_learning:
             self.done_or_not = False
             self.reset()
             while not self.done_or_not:
-                observation, reward, self.done_or_not, _ = self.act_on_greedy()
-                
+                observation, reward, self.done_or_not, self.current_time_steps = self.act_on_greedy()
+                 
                 if self.done_or_not:
                     self.reward_per_episode.append(reward)
 

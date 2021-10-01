@@ -58,7 +58,7 @@ class environment_q_learning:
         self.environment[tuple(self.goal_pos)] = 0.5
 
         # Collection of Rewards (the keys) and associated values (the states). -> Total No of Rewards = 4 -> Requirement 3
-        self.rewards = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]},{5:[4,4]}]
+        self.rewards = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]},{15:[4,4]}]
         self.reward_states = [(0,3),(3,0),(2,3),(3,2),[4,4]]
         # Setting the colors for the reward states in the environment.
         for reward_state in self.rewards:
@@ -85,7 +85,7 @@ class environment_q_learning:
         
         self.environment = np.zeros((5,5))
         
-        self.rewards = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]},{5:[4,4]}]
+        self.rewards = [{-1:[0,3]},{-1:[3,0]},{3:[2,3]},{3:[3,2]},{15:[4,4]}]
         self.reward_states = [(0,3),(3,0),(2,3),(3,2),[4,4]]
         
         for reward in self.rewards:
@@ -214,6 +214,8 @@ class environment_q_learning:
         states_the_actions_lead_to = self.get_states_for_actions(all_possible_actions,self.agent_current_pos)
 
         selected_action, selected_state = self.return_state_action_pair_greedy(all_possible_actions,states_the_actions_lead_to)
+        if self.environment_type == 'stochastic':
+            selected_action, selected_state = self.return_final_stochastic(selected_action, selected_state,all_possible_actions,states_the_actions_lead_to)
 #         print("Agent was at {}, he evaluated {} via actions {} and chose state {} via action {}".format(self.agent_current_pos,all_possible_actions,all_possible_actions,selected_state, selected_action))
         breaker = False
         for reward_state_counter in range(len(self.rewards)):
@@ -459,7 +461,8 @@ class environment_q_learning:
             self.done_or_not = False
             self.reset()
             while not self.done_or_not:
-                observation, reward, self.done_or_not, _ = self.act_on_greedy()
+                # observation, reward, self.done_or_not, _ = self.act_on_greedy()
+                observation, reward, self.done_or_not, self.current_time_steps = self.act_on_greedy()
                 
                 if self.done_or_not:
                     self.reward_per_episode.append(reward)
