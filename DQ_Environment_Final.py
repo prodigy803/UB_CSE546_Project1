@@ -7,11 +7,6 @@ import random
 class environment_dq_learning:
     def __init__(self,type_of_env:str,gamma_disc: float, epsilon:float,epsilon_decay:float,learning_rate:float,no_of_episodes:int,max_time_steps:int):
         
-        self.chain_of_states = []
-        self.chain_of_actions = []
-        self.chain_of_rewards = []
-        self.sarsa_action = None
-        
         if max_time_steps < 10:
             raise ValueError("Timesteps should be greater than of equal to 10")
         
@@ -88,11 +83,6 @@ class environment_dq_learning:
         # Here we are essentially resetting all the values.
         self.current_time_steps = 0
         self.cumulative_reward = 0
-        self.chain_of_states = []
-        self.chain_of_actions = []
-        self.chain_of_rewards = []
-        self.sarsa_state = None
-        self.sarsa_action = None
         self.goal_pos = [4,4]
         self.agent_current_pos = [0,0]
         
@@ -344,17 +334,7 @@ class environment_dq_learning:
         
         return action_to_be_returned, state_to_be_returned, current_max
 
-    def get_best_state_on_reward(self,all_possible_actions, states_the_actions_lead_to):
-        
-        for action,state in zip(all_possible_actions,states_the_actions_lead_to):
-            
-            for i in range(len(self.rewards)):
-                for key, value in self.rewards[i].items():
-                    if value == state:
-                        return action, state
-        return None, None
-
-
+    # A helper function that return the state when given action from the current state or "state" that is part of the parameters for the function.
     def get_state_based_on_action(self, action, state):
         state_copy = list(state).copy()
         if action == 0:
@@ -377,6 +357,7 @@ class environment_dq_learning:
             state_copy[1] +=1
             return state_copy
 
+    # Returns the reward from the state_result, if any. Else return 0
     def check_and_get_reward(self, state_result):
         # print('checking rewards for, ', state_result)
         for i in range(len(self.rewards)):
@@ -388,7 +369,7 @@ class environment_dq_learning:
 
         return 0
 
-    # def get_all_q_values_for_states(self,all_actions,agent_state):
+    # get_states_for_actions - Returns all the states that can be taken from "agent_state", from the list of given "all_actions"
     def get_states_for_actions(self, all_actions, agent_state):
         
         temp_states = list(agent_state).copy() 
@@ -405,10 +386,11 @@ class environment_dq_learning:
 
         return states_considered
 
-    def get_all_possible_actions(self,agent_current_pos):
+    # Returns all the possible actions from a given "agent_current_pos".
+    def get_all_possible_actions(self,given_position):
         
-        x_pos = agent_current_pos[0]
-        y_pos = agent_current_pos[1]
+        x_pos = given_position[0]
+        y_pos = given_position[1]
 
         if (x_pos == 0) and (y_pos == 0):
             return [1,3]
@@ -439,11 +421,13 @@ class environment_dq_learning:
         else:
             return None
 
+    # Render the environment
     def render(self):
         
         plt.imshow(self.environment)
         plt.show()
 
+    # this function just trains the q-value tables for the given parameters.
     def train(self):
         # done = False
         self.reward_per_episode = []
@@ -468,9 +452,12 @@ class environment_dq_learning:
             if self.agent_current_pos == [4,4]:
                 self.final_goal_reached+=1
             
+            # these will be useful for tracking later on
             self.epsilons.append(self.epsilon)
             self.time_steps.append(self.current_time_steps)
-            
+    
+    # This is just the train function, except instead of the step function, we are calling the greedy values only. This is to be called after the train function since we require the
+    # trained q-value tables in this.
     def take_greedy_only(self):
         # done = False
         self.reward_per_episode = []
