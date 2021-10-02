@@ -23,7 +23,7 @@ class environment_dq_learning:
         self.action_set_size = 4
 
         self.gamma = gamma_disc
-        # Q Value Learning Table b
+        # Q Value Learning Table a
         # self. = np.zeros((len(self.environment.flatten())),self.action_set_size)
         self.qvalue_table_a = {}
         for i1 in range(5):
@@ -129,32 +129,6 @@ class environment_dq_learning:
         # check_and_get_reward([2,1]) -> 0
         selected_reward = self.check_and_get_reward(selected_state)
 
-        ## The below code checks the agents current state for any award if available.
-        ## If the awards is available in the transistioned state, then the reward gets erased in the next iteration.
-        breaker = False
-        for reward_state_counter in range(len(self.rewards)):
-            for reward, state in self.rewards[reward_state_counter].items():
-                # if the reward state matches the agents, sum the cum reward and delete that particular reward state space.
-
-                if state == self.agent_current_pos:
-                    self.cumulative_reward += reward
-                    del self.rewards[reward_state_counter]
-                    breaker = True
-                    break
-
-            if breaker:
-                break
-        
-        # We are now re-visualizing the environment
-        self.environment = np.zeros((5,5)) 
-
-        for reward_state_counter in range(len(self.rewards)):
-            for reward, position in self.rewards[reward_state_counter].items():
-                self.environment[tuple(position)] = reward
-            
-        self.environment[tuple(self.goal_pos)] = 0.5
-        self.environment[tuple(self.agent_current_pos)] = 1
-        
         # if the agent has reached the final state then done or if it has taken the maximum time-steps
         if (self.agent_current_pos == self.goal_pos) or (self.current_time_steps == self.max_timesteps):
             self.done_or_not = True
@@ -188,6 +162,32 @@ class environment_dq_learning:
             
             # change the agent position to the selected state.
             self.agent_current_pos = selected_state
+
+            ## The below code checks the agents current state for any award if available.
+            ## If the awards is available in the transistioned state, then the reward gets erased in the next iteration.
+            breaker = False
+            for reward_state_counter in range(len(self.rewards)):
+                for reward, state in self.rewards[reward_state_counter].items():
+                    # if the reward state matches the agents, sum the cum reward and delete that particular reward state space.
+
+                    if state == self.agent_current_pos:
+                        self.cumulative_reward += reward
+                        del self.rewards[reward_state_counter]
+                        breaker = True
+                        break
+
+                if breaker:
+                    break
+            
+            # We are now re-visualizing the environment
+            self.environment = np.zeros((5,5)) 
+
+            for reward_state_counter in range(len(self.rewards)):
+                for reward, position in self.rewards[reward_state_counter].items():
+                    self.environment[tuple(position)] = reward
+                
+            self.environment[tuple(self.goal_pos)] = 0.5
+            self.environment[tuple(self.agent_current_pos)] = 1
         
         return self.environment.flatten, self.cumulative_reward, self.done_or_not, self.current_time_steps
 
