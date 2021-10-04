@@ -458,3 +458,33 @@ class environment_q_learning:
             
             self.epsilons.append(self.epsilon)
             self.time_steps.append(self.current_time_steps)
+
+    # this function just trains the q-value tables for the given parameters.
+    def take_greedy_and_render(self):
+        # done = False
+        self.reward_per_episode = []
+        self.epsilons = []
+        self.time_steps = []
+        self.final_goal_reached = 0
+        self.epsilons.append(self.epsilon)
+        # for i in range(1):
+        self.current_time_steps = 0
+        self.done_or_not = False
+        self.reset()
+        while not self.done_or_not:
+            observation, reward, self.done_or_not, _ = self.act_on_greedy()
+            
+            if self.done_or_not:
+                self.reward_per_episode.append(reward)
+
+            self.render()
+
+        self.current_episode+=1
+        if self.epsilon > 0:
+            self.epsilon -= self.epsilon*self.epsilon_decay
+        
+        if self.agent_current_pos == [4,4]:
+            self.final_goal_reached+=1
+        
+        self.epsilons.append(self.epsilon)
+        self.time_steps.append(self.current_time_steps)
